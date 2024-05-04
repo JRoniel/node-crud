@@ -14,13 +14,6 @@ e a biblioteca Mongoose para criar uma API RESTful para operações CRUD (Create
 
 ## Executando Localmente
 
-Clone o projeto
-
-```bash
-  git init
-  git@github.com:GuiOliver27/node-crud.git
-```
-
 Entre no diretório do projeto
 
 ```bash
@@ -41,6 +34,8 @@ Inicie o servidor
 
 ## Contribuições
 Contribuições são bem-vindas! Se você encontrar um problema ou desejar adicionar novos recursos, sinta-se à vontade para criar um Pull Request.
+- Guilherme Oliveira @GuiOliver27
+- John Roniel @JRoniel
 
 ## Licença
 Este projeto está licenciado sob a Licença MIT.

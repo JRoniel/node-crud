@@ -1,40 +1,40 @@
-
 const express = require('express')
 const app = express()
  
 const mongoose = require('mongoose')
-const Person = require ('./models/Person')
+const Person = require('./models/Person')
 
-app.use(
-    express.urlencoded({
-        extended: true,
-    }),
-)
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.use(express.json())
-
-// rotas
+// Rotas
+// Rota para criar uma nova pessoa
 app.post('/person', async (req, res) => {
-    const { name, salary, approved } = req.body
+    const { name, salary, approved } = req.body;
 
-    const person = {
-        name,
-        salary,
-        approved,
+    if(!name || !salary || approved === undefined){
+        return res.status(422).json({error: 'Campos obrigatórios faltando!'})
     }
 
     try {
-        await Person.create(person)
-        
-        res.status(201).json({ message: 'Pessoa inserida no sistema com sucesso! '})
+        const savePerson = await Person.create({
+            name,
+            salary,
+            approved
+        });
+
+        console.debug('[DEBUG] Pessoa inserida: ', savePerson);
+
+        res.status(201).json({ message: 'Pessoa inserida com sucesso!' });
     } catch (error) {
-        res.status(500).json({ erro: error})
+        res.status(500).json({ error: error.message });
     }
-})
+});
 
-app.get('./person', async (req, res) => {
+//Rota para retornar todas as pessoas
+app.get('/person', async (req, res) => {
     try {
-        const people = await Person.find()
+        const people = await Person.find({}, '_id name salary approved')
 
         res.status(200).json(people)
     } catch (error) {
@@ -42,11 +42,12 @@ app.get('./person', async (req, res) => {
     }
 })
 
-app.get('./person/:id', async (req, res) => {
+//Rota para buscar uma pessoa pelo ID
+app.get('/person/:id', async (req, res) => {
     const id = req.params.id
 
     try {
-        const person = await Person.findOne({ _id: id })
+        const person = await Person.findOne({ _id: id }, 'name salary approved')
 
         if (!person) {
             res.status(422).json({ message: 'Usuário não encontrado! '})
@@ -59,6 +60,7 @@ app.get('./person/:id', async (req, res) => {
     }
 })
 
+//Rota para atualizar uma pessoa
 app.patch('/person/:id', async (req, res) => {
     const id = req.params.id
   
@@ -84,6 +86,7 @@ app.patch('/person/:id', async (req, res) => {
     }
 })
 
+//Rota para deletar uma pessoa
 app.delete('/person/:id', async (req, res) => {
     const id = req.params.id
 
@@ -105,14 +108,17 @@ app.delete('/person/:id', async (req, res) => {
 
 app.get('/', (req, res) => {
     res.json({ message: 'Oi Express! '})
+    console.debug('[DEBUG] Requisição recebida com sucesso!')
 })
 
 mongoose
     .connect(
-        'mongodb+srv://user:password@restfulapibanco.lq7ds.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
+        'mongodb://localhost:27017/myFirstDatabase',
     )
     .then(() => {
-        console.log('Conectou ao banco!')
-        app.listen
+        console.log('[INFO] Conectou ao banco!')
+        app.listen(3000, () => {
+            console.log('[INFO] Servidor rodando na porta 3000');
+        });
     })
 .catch((err) => console.log(err))
